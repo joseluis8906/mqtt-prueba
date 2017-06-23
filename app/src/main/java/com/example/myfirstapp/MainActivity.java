@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             String topic = intent.getStringExtra("topic");
             String message = intent.getStringExtra("message");
-            //Log.i("mqtt", "Got message: " + message);
+            Log.i("mqtt", "Got message: " + message);
             handleMessage(topic, message);
         }
     };
@@ -94,11 +94,11 @@ public class MainActivity extends AppCompatActivity {
         textView.setText(textView.getText() + "\n" + Message);
     }
 
-    @Override
+    /*@Override
     protected void onDestroy() {
         // Unregister since the activity is not visible
         stopService(intent);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         super.onDestroy();
-    }
+    }*/
 }
