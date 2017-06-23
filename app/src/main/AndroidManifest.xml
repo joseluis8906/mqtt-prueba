@@ -31,6 +31,13 @@
             android:name=".MyMqttService"
             android:enabled="true"
             android:exported="true"></service>
+
+        <receiver android:name=".BootBroadcast">
+            <intent-filter >
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>
