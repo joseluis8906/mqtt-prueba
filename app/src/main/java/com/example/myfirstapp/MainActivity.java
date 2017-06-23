@@ -1,5 +1,6 @@
 package com.example.myfirstapp;
 
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -30,16 +32,31 @@ public class MainActivity extends AppCompatActivity {
         TextView textView = (TextView) findViewById(R.id.textView);
         textView.setText("Inicio");
 
-        intent = new Intent(this, MyMqttService.class);
-        intent.putExtra("data", data);
-        startService(intent);
+
+        if (!isMyServiceRunning()){
+            intent = new Intent(this, MyMqttService.class);
+            intent.putExtra("data", data);
+            startService(intent);
+            Log.d("App", "Service started");
+        } else {
+            Log.d("App", "Service already running");
+        }
+
     }
 
+    private boolean isMyServiceRunning() {
+        ActivityManager activityManager = (ActivityManager)getSystemService(ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo serviceInfo: activityManager.getRunningServices(Integer.MAX_VALUE)) {
+            if (MyMqttService.class.getName().equals(serviceInfo.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
     // handler for received Intents for the "my-event" event
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // Extract data included in the Intent
             String topic = intent.getStringExtra("topic");
             String message = intent.getStringExtra("message");
             //Log.i("mqtt", "Got message: " + message);
@@ -74,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void handleMessage (String topic, String Message) {
         TextView textView = (TextView) findViewById(R.id.textView);
-        textView.setText(textView.getText() + "\n" +Message);
+        textView.setText(textView.getText() + "\n" + Message);
     }
 
     @Override

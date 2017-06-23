@@ -1,12 +1,15 @@
 package com.example.myfirstapp;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -79,8 +82,8 @@ public class MyMqttService extends Service implements MqttCallback {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        data=(String) intent.getExtras().get("data");
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("my-event2"));
+        /*data = (String) intent.getExtras().get("data");
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("my-event2"));*/
         sendMessage("servicio a toda");
         return Service.START_STICKY;
     }
@@ -154,12 +157,34 @@ public class MyMqttService extends Service implements MqttCallback {
         intent.putExtra("topic", topic);
         intent.putExtra("message", message);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
+        NotificationCompat.Builder mBuilder;
+        NotificationManager mNotifyMgr =(NotificationManager) getApplicationContext().getSystemService(NOTIFICATION_SERVICE);
+
+        int icono = R.mipmap.ic_launcher;
+
+        mBuilder =new NotificationCompat.Builder(getApplicationContext())
+                .setSmallIcon(icono)
+                .setContentTitle(topic)
+                .setContentText(message)
+                .setVibrate(new long[] {100, 250, 100, 500})
+                .setAutoCancel(true);
+        mBuilder.setDefaults(Notification.DEFAULT_ALL);
+        mNotifyMgr.notify(1, mBuilder.build());
+
+
     }
 
     @Override
     public void onDestroy() {
 
-        isRunning = false;
+
+
+        Intent intent = new Intent(this, MyMqttService.class);
+        intent.putExtra("data", "as");
+        startService(intent);
+
+        /*isRunning = false;
         try {
             sampleClient.disconnect();
         }
@@ -168,7 +193,7 @@ public class MyMqttService extends Service implements MqttCallback {
         }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         super.onDestroy();
-        Log.i ("mqtt", "MyMqtt Service destroyed");
+        Log.i ("mqtt", "MyMqtt Service destroyed");*/
     }
 
 }
